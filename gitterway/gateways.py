@@ -1,4 +1,5 @@
 import irc.bot
+from random import randint
 
 
 class ConfigurationError(Exception):
@@ -32,6 +33,11 @@ class IRCAccount(Account):
 			for channel in self._channels_to_join:
 				print("Joining %r" % (channel))
 				c.join(channel)
+
+		def on_nicknameinuse(self, c, e):
+			new_nick = c.get_nickname() + str(randint(100, 999))
+			print("Nickname in use. Renaming to %s..." % (new_nick))
+			c.nick(new_nick)
 
 	def __init__(self, name, args):
 		super().__init__(name, args)
