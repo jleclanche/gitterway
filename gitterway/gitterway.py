@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import importlib
 from configparser import ConfigParser
 
 
@@ -21,8 +22,6 @@ class GitterWay:
 			help="Configuration file",
 		)
 		self.accounts = {}
-		for protocol in PROTOCOLS:
-			self.accounts[protocol] = {}
 
 	def run(self, args):
 		args = self.parser.parse_args(args)
@@ -32,10 +31,22 @@ class GitterWay:
 	def init_config(self, config):
 		self.config.read(config)
 
-		for protocol, cls in PROTOCOLS.items():
+		if not self.config.has_section("protocols"):
+			raise ConfigurationError("No protocols defined in config file.")
+
+		protocol_classes = {}
+		for protocol in self.config.options("protocols"):
+			path, _, name = self.config.get("protocols", protocol).rpartition(".")
+			module = importlib.import_module(path)
+			protocol_classes[protocol] = getattr(module, name)
+
+		for protocol, cls in protocol_classes.items():
+			self.accounts[protocol] = {}
+
 			for section in self.config.sections():
 				if section.count(":") != 1:
-					raise ConfigurationError("Bad config key: %r" % (section))
+					# Not a protocol key
+					continue
 
 				p, name = section.split(":")
 				if protocol == p:
@@ -51,32 +62,6 @@ class GitterWay:
 		for protocol_accounts in self.accounts.values():
 			for account in protocol_accounts.values():
 				account.connect()
-
-
-class Account:
-	def __init__(self, name, args):
-		self.name = name
-		self.args = args
-
-	def __repr__(self):
-		return "%s(%r)" % (self.__class__.__name__, self.name)
-
-	def connect(self):
-		print("%r: connecting..." % (self))
-
-
-class IRCAccount(Account):
-	pass
-
-
-class GitterAccount(Account):
-	pass
-
-
-PROTOCOLS = {
-	"irc": IRCAccount,
-	"gitter": GitterAccount,
-}
 
 
 def main():
