@@ -22,6 +22,7 @@ class GitterWay:
 			help="Configuration file",
 		)
 		self.accounts = {}
+		self.gateways = {}
 
 	def run(self, args):
 		args = self.parser.parse_args(args)
@@ -57,6 +58,31 @@ class GitterWay:
 					options = {k: self.config.get(section, k) for k in optkeys}
 
 					self.accounts[protocol][name] = cls(name, options)
+
+		# do the gateways now
+		for section in self.config.sections():
+			if not section.startswith("gateway:"):
+				continue
+
+			_, name = section.split(":")
+			inspec = self.config.get(section, "in").split(",")
+			outspec = self.config.get(section, "out").split(",")
+
+			sinks = []
+
+			for spec in outspec:
+				protocol, accname, channel = spec.strip().split(":")
+				sinks.append((self.accounts[protocol][accname], channel))
+
+			for spec in inspec:
+				protocol, accname, inchan = spec.strip().split(":")
+				inserv = self.accounts[protocol][accname]
+				for outserv, outchan in sinks:
+					if inserv == outserv and inchan == outchan:
+						# Skip identical input/output (e.g. 2-way mirroring)
+						continue
+					inserv.register_sink(inchan, outserv, outchan)
+
 
 	def connect_all_accounts(self):
 		for protocol_accounts in self.accounts.values():
