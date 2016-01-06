@@ -1,0 +1,31 @@
+# Supported protocols. Path to an importable Python class.
+# Deleting these mean the protocol will not be supported!
+[protocols]
+irc = gateways.IRCAccount
+gitter = gateways.GitterAccount
+
+# Your gitter accounts, with the name you choose.
+# You should have a dedicated Github account for bots!
+# [gitter:mybot]
+# apikey = 29d202795850c38dfbe5f6bcc979658c1f7e424d
+#
+# [gitter:myotherbot]
+# apikey = 9338fe0e50f11c9768299be39ffb8df18bd9cc00
+
+# Your IRC accounts. `server` is the only required parameter.
+# [irc:mybot]
+# server = chat.freenode.net
+# port = 6667
+# nick = MyAwesomeBot
+
+# Gateways are pairs of input channels and output channels.
+# All input (save from the bot's) will be mirrored to all output channels.
+# This is an example two-way mirroring gateway.
+# [gateway:example1]
+# in = gitter:mybot:example/example, irc:mybot:#example
+# out = gitter:mybot:example/example, irc:mybot:#example
+#
+# And this is an example 1-way gateway (Only IRC forwarded to gitter)
+# [gateway:letsauth]
+# in = irc:mybot
+# out = gitter:myotherbot:example/example
