@@ -1,0 +1,40 @@
+[gitter]
+	# Your gitter accounts
+
+	[gitter.hsimbot]
+	apikey = "..."
+
+	[gitter.helixbot]
+	apikey = "..."
+
+[irc]
+	# Your IRC accounts
+
+	[irc.helixbot]
+	server = "chat.freenode.net"
+	port = 6697
+	nick = "HelixBot"
+
+
+# Define your gateways below
+[[gateway]]
+	name = "hearthsim"
+	in = [
+		{ account = "gitter.hsimbot", channel = "hearthsim/hearthsim" },
+		{ account = "irc.helixbot", channel = "#hearthsim" },
+	]
+	out = [
+		{ account = "gitter.hsimbot", channel = "hearthsim/hearthsim" },
+		{ account = "irc.helixbot", channel = "#hearthsim" },
+	]
+
+[[gateway]]
+	name = "letsauth"
+	in = [
+		{ account = "gitter.helixbot", channel = "letsauth/letsauth" },
+		{ account = "irc.helixbot", channel = "#letsauth" },
+	]
+	out = [
+		{ account = "gitter.helixbot", channel = "hearthsim/hearthsim" },
+		{ account = "irc.helixbot", channel = "#hearthsim" },
+	]
